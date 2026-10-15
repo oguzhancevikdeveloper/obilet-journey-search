@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Obilet.JourneySearch.Web/Obilet.JourneySearch.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+</Solution>
