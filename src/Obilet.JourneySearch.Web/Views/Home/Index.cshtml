@@ -1,0 +1,197 @@
+﻿
+@model Obilet.JourneySearch.Web.Models.ViewModels.HomeViewModel
+
+@{
+    ViewData["Title"] = "Otobüs Bileti Ara";
+    var locations = Model.Locations;
+}
+
+<div class="home-page">
+    <div class="container home-container">
+
+        <section class="home-hero">
+            <span class="home-eyebrow">YOLCULUĞUN BURADA BAŞLIYOR</span>
+            <h1>Yolculuğunu planla.</h1>
+            <p>Şehrini seç, tarihini belirle, sana uygun seferleri keşfet.</p>
+        </section>
+
+        <section class="home-search-card">
+            <div class="home-card-heading">
+                <div class="home-card-icon" aria-hidden="true">🚌</div>
+                <div>
+                    <h2>Otobüs bileti ara</h2>
+                    <p>Kalkış ve varış noktalarını seçerek başlayabilirsin.</p>
+                </div>
+            </div>
+
+            <div class="home-card-accent"></div>
+
+            <form asp-controller="Home"
+                  asp-action="Search"
+                  method="post"
+                  id="journeySearchForm">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="All"
+                     class="home-validation-summary"
+                     role="alert"></div>
+
+                <div id="validationMessage"
+                     class="alert alert-danger d-none"
+                     role="alert"></div>
+
+                <div class="home-route-fields">
+
+                    <div class="home-field">
+                        <label for="originSearch" class="home-label">
+                            Nereden
+                        </label>
+
+                        <div class="home-input-wrapper">
+                            <span class="home-input-icon" aria-hidden="true">↗</span>
+
+                            <input type="text"
+                                   id="originSearch"
+                                   name="OriginName"
+                                   class="form-control home-input"
+                                   placeholder="Kalkış noktası ara..."
+                                   autocomplete="off"
+                                   aria-label="Kalkış noktası"
+                                   aria-autocomplete="list"
+                                   aria-controls="originSuggestions"
+                                   value="@Model.OriginName" />
+
+                            <input type="hidden"
+                                   id="originId"
+                                   name="OriginId"
+                                   value="@Model.OriginId" />
+
+                            <div id="originSuggestions"
+                                 class="list-group home-suggestions"
+                                 role="listbox"
+                                 style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="home-swap-wrapper">
+                        <button type="button"
+                                id="swapLocations"
+                                class="home-swap-button"
+                                aria-label="Kalkış ve varış noktalarını değiştir"
+                                title="Noktaları değiştir">
+                            <span aria-hidden="true">⇄</span>
+                        </button>
+                    </div>
+
+                    <div class="home-field">
+                        <label for="destinationSearch" class="home-label">
+                            Nereye
+                        </label>
+
+                        <div class="home-input-wrapper">
+                            <span class="home-input-icon" aria-hidden="true">↘</span>
+
+                            <input type="text"
+                                   id="destinationSearch"
+                                   class="form-control home-input"
+                                   placeholder="Varış noktası ara..."
+                                   autocomplete="off"
+                                   aria-label="Varış noktası"
+                                   aria-autocomplete="list"
+                                   aria-controls="destinationSuggestions"
+                                   name="DestinationName"
+                                   value="@Model.DestinationName" />
+
+                            <input type="hidden"
+                                   id="destinationId"
+                                   name="DestinationId"
+                                   value="@Model.DestinationId" />
+
+                            <div id="destinationSuggestions"
+                                 class="list-group home-suggestions"
+                                 role="listbox"
+                                 style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="home-date-section">
+                    <div class="home-field home-date-field">
+                        <label for="departureDate" class="home-label">
+                            Gidiş tarihi
+                        </label>
+
+                        <input type="date"
+                               id="departureDate"
+                               name="departureDate"
+                               class="form-control home-input home-date-input"
+                               value="@Model.DepartureDate.ToString("yyyy-MM-dd")"
+                               min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                               required />
+                    </div>
+
+                    <div class="home-date-shortcuts">
+                        <span class="home-shortcut-label">Hızlı seçim</span>
+
+                        <div class="home-date-buttons">
+                            <button type="button"
+                                    id="todayButton"
+                                    class="home-date-button">
+                                Bugün
+                            </button>
+
+                            <button type="button"
+                                    id="tomorrowButton"
+                                    class="home-date-button">
+                                Yarın
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="home-search-footer">
+                    <span class="home-search-note">
+                        <span aria-hidden="true">✓</span>
+                        Seferleri karşılaştır, yolculuğunu planla.
+                    </span>
+
+                    <button type="submit" class="home-search-button">
+                        Sefer ara
+                        <span aria-hidden="true">→</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <div class="home-trust-note">
+            <span aria-hidden="true">♥</span>
+            Bir sonraki yolculuğuna bir adım daha yakınsın.
+        </div>
+
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/home.css"
+          asp-append-version="true" />
+}
+
+
+@section Scripts {
+    <script>
+        window.busLocations = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model.Locations.Select(location => new
+            {
+                id = location.Id,
+                name = location.Name,
+                longName = location.LongName
+            })
+        ));
+    </script>
+
+    <script src="~/js/home.js" asp-append-version="true"></script>
+}
