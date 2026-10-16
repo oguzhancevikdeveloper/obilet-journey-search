@@ -108,6 +108,10 @@ The application uses the following API endpoints:
 - `POST /location/getbuslocations`
 - `POST /journey/getbusjourneys`
 
+<img width="1255" height="795" alt="image" src="https://github.com/user-attachments/assets/b917959c-198b-4d9e-8422-154eb9632d70" />
+<img width="1302" height="813" alt="image" src="https://github.com/user-attachments/assets/78decafb-4124-4705-97bf-067547f46e2a" />
+
+
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
