@@ -104,7 +104,11 @@ if (!originId.value || !destinationId.value) {
         let requestController;
 
 searchInput.addEventListener("focus", () => {
+    searchInput.value = "";
+    hiddenId.value = "";
+    suggestions.replaceChildren();
     suggestions.style.display = "none";
+    validateForm();
 });
 
         searchInput.addEventListener("input", () => {
