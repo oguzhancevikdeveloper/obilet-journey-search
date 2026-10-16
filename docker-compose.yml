@@ -1,0 +1,39 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: obilet-journey-search-web
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      # Obilet API Configuration - Update these values
+      - OBILET_API_BASE_URL=${OBILET_API_BASE_URL:-https://api.obilet.com}
+      - OBILET_API_CLIENT_TOKEN=${OBILET_API_CLIENT_TOKEN:-default-token}
+    volumes:
+      # Optional: Mount for development
+      - ./src/Obilet.JourneySearch.Web:/app/app
+    networks:
+      - obilet-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+networks:
+  obilet-network:
+    driver: bridge

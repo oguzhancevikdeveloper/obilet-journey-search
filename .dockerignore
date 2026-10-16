@@ -1,0 +1,99 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE and Editor files
+.vs
+.vscode
+.idea
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Build results
+bin/
+obj/
+Debug/
+Release/
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options
+.vs/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+# Test Results
+TestResults/
+*.trx
+
+# User-specific files
+*.rsuser
+
+# Rider
+.idea/
+*.sln.iml
+*.sln.VC.db
+*.VC.db
+
+# OS specific
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Environment files (keep .env.example, but ignore local .env)
+.env
+.env.local
+.env.*.local
+.env.production.local
+
+# Node modules (if any)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.backup
+
+# Coverage reports
+coverage/
+*.coverage
+
+# npm
+package-lock.json
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Publishing artifacts
+publish/
+
+# IIS
+Properties/launchSettings.json
+
+# Backup files
+*.Backup.tmp
