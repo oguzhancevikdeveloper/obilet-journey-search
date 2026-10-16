@@ -3,6 +3,16 @@ namespace Obilet.JourneySearch.Web.Controllers;
 public class HomeController(IObiletSessionService obiletSessionService,
                             IBusLocationService busLocationService) : Controller
 {
+    /// <summary>
+    /// Asynchronously prepares and returns the home view populated with available bus locations and default origin,
+    /// destination, and a departure date set to tomorrow.
+    /// </summary>
+    /// <remarks>Normalizes the client IP address, ensures an external session via obiletSessionService,
+    /// retrieves the device session and locations from busLocationService, and constructs the HomeViewModel used by the
+    /// view.</remarks>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the asynchronous operation.</param>
+    /// <returns>An IActionResult that renders the home view with a HomeViewModel containing retrieved locations, default
+    /// origin/destination selections, and the departure date.</returns>
     public async Task<IActionResult> Index(
         CancellationToken cancellationToken)
     {
@@ -49,7 +59,18 @@ public class HomeController(IObiletSessionService obiletSessionService,
 
 
 
-
+    /// <summary>
+    /// Validates search input, enforces business rules, and navigates to the Journey index when valid; otherwise
+    /// returns the search form with validation errors.
+    /// </summary>
+    /// <remarks>HTTP POST action protected by anti-forgery validation. Performs ModelState validation,
+    /// ensures OriginId and DestinationId differ, and enforces DepartureDate not earlier than today. On invalid model,
+    /// retrieves locations and returns the home view with errors.</remarks>
+    /// <param name="model">SearchJourneyViewModel containing search criteria and display values (OriginId, DestinationId, OriginName,
+    /// DestinationName, DepartureDate).</param>
+    /// <param name="cancellationToken">Token used to cancel the asynchronous operation.</param>
+    /// <returns>An IActionResult that redirects to the Journey index with route values when the model is valid, or returns the
+    /// search form populated with validation errors when invalid.</returns>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Search(
@@ -99,7 +120,15 @@ public class HomeController(IObiletSessionService obiletSessionService,
     }
 
 
-
+    /// <summary>
+    /// Searches for locations that match the specified keyword and returns a JSON array of objects with id, name, and
+    /// longName.
+    /// </summary>
+    /// <remarks>If keyword is null or whitespace an empty array is returned. The device session is obtained
+    /// from HttpContext.Session. The underlying search call is invoked with CancellationToken.None.</remarks>
+    /// <param name="keyword">Search term used to match locations.</param>
+    /// <param name="cancellationToken">Cancellation token for the request; not forwarded to the underlying location search call.</param>
+    /// <returns>A JSON result containing an array of matching locations, each object with properties id, name, and longName.</returns>
     [HttpGet]
     public async Task<IActionResult> SearchLocations(
     string keyword,

@@ -180,6 +180,18 @@
           asp-append-version="true" />
 }
 
+
 @section Scripts {
+    <script>
+        window.busLocations = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model.Locations.Select(location => new
+            {
+                id = location.Id,
+                name = location.Name,
+                longName = location.LongName
+            })
+        ));
+    </script>
+
     <script src="~/js/home.js" asp-append-version="true"></script>
 }

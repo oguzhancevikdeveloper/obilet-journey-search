@@ -103,13 +103,34 @@ if (!originId.value || !destinationId.value) {
         let searchTimeout;
         let requestController;
 
+
 searchInput.addEventListener("focus", () => {
     searchInput.value = "";
     hiddenId.value = "";
     suggestions.replaceChildren();
-    suggestions.style.display = "none";
+
+    const locations = window.busLocations || [];
+
+    locations.forEach(location => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "list-group-item list-group-item-action";
+        item.textContent = location.longName || location.name;
+
+        item.addEventListener("click", () => {
+            searchInput.value = location.name;
+            hiddenId.value = location.id;
+            suggestions.style.display = "none";
+            validateForm();
+        });
+
+        suggestions.appendChild(item);
+    });
+
+    suggestions.style.display = locations.length > 0 ? "block" : "none";
     validateForm();
 });
+
 
         searchInput.addEventListener("input", () => {
             hiddenId.value = "";
