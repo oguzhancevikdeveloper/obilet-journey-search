@@ -8,3 +8,7 @@ global using Microsoft.AspNetCore.Mvc;
 global using Obilet.JourneySearch.Web.Models;
 global using Obilet.JourneySearch.Web.Models.Api.Session;
 global using System.Diagnostics;
+global using Obilet.JourneySearch.Web.Services.Journey;
+global using Microsoft.AspNetCore.Mvc;
+global using Obilet.JourneySearch.Web.Models.Api.Journey;
+global using Obilet.JourneySearch.Web.Models.ViewModels;

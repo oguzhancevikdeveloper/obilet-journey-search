@@ -39,9 +39,9 @@ builder.Services.AddSession(options =>
 builder.Services.AddTransient<ObiletApiClient>();
 builder.Services.AddScoped<IObiletSessionService,ObiletSessionService>();
 builder.Services.AddScoped<IBusLocationService,BusLocationService>();
+builder.Services.AddTransient<IJourneyService, JourneyService>();
 
 #endregion
-
 
 // Bütün servis kayıtları tamamlandıktan sonra Build çağrılır.
 var app = builder.Build();

@@ -1,0 +1,194 @@
+﻿
+@model Obilet.JourneySearch.Web.Models.ViewModels.JourneyViewModel
+
+@{
+    ViewData["Title"] = "Otobüs Seferleri";
+}
+
+<div class="journey-page">
+    <div class="container py-4 py-md-5">
+
+        <header class="journey-header mb-4">
+            <div>
+                <span class="journey-eyebrow">YOLCULUĞUNU PLANLA</span>
+                <h1 class="journey-title">Otobüs Seferleri</h1>
+                <p class="text-muted mb-0">
+                    @Model.DepartureDate.ToString("dd MMMM yyyy")
+                </p>
+            </div>
+
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="btn journey-back-button">
+                <span aria-hidden="true">←</span>
+                Yeni arama
+            </a>
+        </header>
+
+        <section class="journey-route mb-4"
+                 aria-label="Arama özeti">
+            <div class="journey-route-point">
+                <span class="journey-route-label">KALKIŞ</span>
+                <span class="journey-route-name">@Model.OriginName</span>
+            </div>
+
+            <div class="journey-route-arrow" aria-hidden="true">
+                <span>→</span>
+            </div>
+
+            <div class="journey-route-point journey-route-destination">
+                <span class="journey-route-label">VARIŞ</span>
+                <span class="journey-route-name">@Model.DestinationName</span>
+            </div>
+
+            <div class="journey-route-date">
+                <span aria-hidden="true">▦</span>
+                @Model.DepartureDate.ToString("dd.MM.yyyy")
+            </div>
+        </section>
+
+        @if (Model.Journeys.Count == 0)
+        {
+            <div class="journey-empty-state">
+                <div class="journey-empty-icon" aria-hidden="true">🚌</div>
+                <h2>Sefer bulunamadı</h2>
+                <p>
+                    Seçtiğiniz tarih için uygun sefer bulunamadı.
+                    Farklı bir tarih deneyebilirsiniz.
+                </p>
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="btn journey-primary-button">
+                    Yeni arama yap
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="journey-results-heading">
+                <div>
+                    <h2>Uygun seferler</h2>
+                    <p class="text-muted mb-0">
+                        Yolculuğunuza uygun seferleri inceleyin.
+                    </p>
+                </div>
+
+                <span class="journey-result-count">
+                    @Model.Journeys.Count sefer
+                </span>
+            </div>
+
+            <div class="journey-list">
+                @foreach (var journey in Model.Journeys)
+                {
+                    <article class="journey-card">
+                        <div class="journey-card-main">
+
+                            <div class="journey-company">
+                                <div class="journey-company-mark"
+                                     aria-hidden="true">🚌</div>
+                                <div class="journey-company-info">
+                                    <span class="journey-label">OTOBÜS FİRMASI</span>
+                                    <span class="journey-company-name">
+                                        @(journey.PartnerName ?? "Firma bilgisi yok")
+                                    </span>
+                                    <span class="journey-bus-type">
+                                        @(journey.BusType ?? "Otobüs")
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="journey-timeline">
+                                <div class="journey-time-point">
+                                    <span class="journey-time">
+                                        @(journey.Journey?.Departure?.ToString("HH:mm") ?? "--:--")
+                                    </span>
+                                    <span class="journey-terminal"
+                                          title="Kalkış noktası">
+                                        @(journey.Journey?.Origin
+                                            ?? journey.OriginLocation
+                                            ?? "Kalkış bilgisi yok")
+                                    </span>
+                                </div>
+
+                                <div class="journey-duration">
+                                    <span class="journey-duration-text">
+                                        @{
+                                            var durationText = "-";
+
+                                            if (TimeSpan.TryParse(
+                                                journey.Journey?.Duration,
+                                                out var duration))
+                                            {
+                                                durationText =
+                                                    $"{(int)duration.TotalHours} sa. {duration.Minutes:D2} dk.";
+                                            }
+                                        }
+                                        @durationText
+                                    </span>
+                                    <div class="journey-duration-line"
+                                         aria-hidden="true">
+                                        <span></span>
+                                    </div>
+                                        <span class="journey-duration-caption">
+                                            Direkt yolculuk
+                                        </span>
+                                </div>
+
+                                <div class="journey-time-point journey-arrival">
+                                    <span class="journey-time">
+                                        @(journey.Journey?.Arrival?.ToString("HH:mm") ?? "--:--")
+                                    </span>
+                                    <span class="journey-terminal"
+                                          title="Varış noktası">
+                                        @(journey.Journey?.Destination
+                                            ?? journey.DestinationLocation
+                                            ?? "Varış bilgisi yok")
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="journey-price-area">
+                                <span class="journey-label">BİLET FİYATI</span>
+
+                                @if (journey.Journey?.InternetPrice is decimal price)
+                                {
+                                    <div class="journey-price">
+                                        @price.ToString("N2")
+                                        <span>
+                                            @(journey.Journey.Currency ?? "TRY")
+                                        </span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="journey-price-unavailable">
+                                        Fiyat bilgisi yok
+                                    </div>
+                                }
+
+                                <span class="journey-seat-info">
+                                    @if (journey.AvailableSeats is int seats)
+                                    {
+                                        <span>@seats boş koltuk</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Koltuk bilgisi yok</span>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/journey.css"
+          asp-append-version="true" />
+}

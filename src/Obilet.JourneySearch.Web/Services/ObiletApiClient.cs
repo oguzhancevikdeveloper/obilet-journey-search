@@ -7,10 +7,11 @@ public sealed class ObiletApiClient(
         httpClientFactory.CreateClient("ObiletApi");
 
 
-    public async Task<TResponse?> PostAsync<TRequest, TResponse>(
+    public async Task<TResponse> PostAsync<TRequest, TResponse>(
         string endpoint,
         TRequest request,
         CancellationToken cancellationToken = default)
+        where TResponse : class
     {
         try
         {
@@ -21,20 +22,22 @@ public sealed class ObiletApiClient(
 
             response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadFromJsonAsync<TResponse>(
+            var result = await response.Content.ReadFromJsonAsync<TResponse>(
                 cancellationToken: cancellationToken);
+
+            return result ?? throw new InvalidOperationException(
+                "Obilet API boş veya geçersiz bir yanıt döndürdü.");
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            Console.WriteLine(
-                $"Obilet isteği çağıran tarafça iptal edildi: {endpoint}");
-
+            // İstek çağıran tarafça iptal edildi.
             throw;
         }
-        catch (OperationCanceledException ex)
+        catch (Exception ex)
         {
-            Console.WriteLine(
-                $"Obilet isteği timeout veya başka bir iptal nedeniyle sonlandı: {endpoint}. {ex.Message}");
+            // Token veya hassas istek verilerini loglama.
+            Console.Error.WriteLine(
+                $"Obilet API isteği başarısız. Endpoint: {endpoint}. Hata: {ex.Message}");
 
             throw;
         }

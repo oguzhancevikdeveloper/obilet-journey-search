@@ -11,6 +11,56 @@ document.addEventListener("DOMContentLoaded", () => {
     const departureDate = document.getElementById("departureDate");
     const validationMessage = document.getElementById("validationMessage");
 
+
+    const storageKey = "obilet-last-search";
+
+function saveSearch() {
+    if (!originId.value || !destinationId.value || !departureDate.value) {
+        return;
+    }
+
+    localStorage.setItem(storageKey, JSON.stringify({
+        originId: originId.value,
+        originName: originSearch.value,
+        destinationId: destinationId.value,
+        destinationName: destinationSearch.value,
+        departureDate: departureDate.value
+    }));
+}
+
+
+
+function restoreSearch() {
+    const savedSearch = localStorage.getItem(storageKey);
+
+    if (!savedSearch) {
+        return;
+    }
+
+    try {
+        const search = JSON.parse(savedSearch);
+
+        if (search.originId && search.originName) {
+            originId.value = search.originId;
+            originSearch.value = search.originName;
+        }
+
+        if (search.destinationId && search.destinationName) {
+            destinationId.value = search.destinationId;
+            destinationSearch.value = search.destinationName;
+        }
+
+        if (search.departureDate) {
+            departureDate.value = search.departureDate;
+        }
+    } catch (error) {
+        console.error("Kayıtlı arama okunamadı:", error);
+        localStorage.removeItem(storageKey);
+    }
+}
+
+
+
     function formatDate(date) {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -202,6 +252,10 @@ document.querySelector("form").addEventListener("submit", event => {
 
     if (!validateForm()) {
         event.preventDefault();
+         return;
     }
+    saveSearch();
 });
+
+restoreSearch();
 });
