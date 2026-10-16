@@ -1,6 +1,4 @@
-﻿using Obilet.JourneySearch.Web.Models.Api.Journey;
-
-namespace Obilet.JourneySearch.Web.Services.Journey;
+﻿namespace Obilet.JourneySearch.Web.Services.Journey;
 
 public interface IJourneyService
 {

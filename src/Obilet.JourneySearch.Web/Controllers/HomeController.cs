@@ -4,22 +4,25 @@ public class HomeController(IObiletSessionService obiletSessionService,
                             IBusLocationService busLocationService) : Controller
 {
     /// <summary>
-    /// Asynchronously prepares and returns the home view populated with available bus locations and default origin,
-    /// destination, and a departure date set to tomorrow.
+    /// Kullanılabilir lokasyonlar ve varsayılan arama parametreleriyle ana sayfayı görüntüler.
     /// </summary>
-    /// <remarks>Normalizes the client IP address, ensures an external session via obiletSessionService,
-    /// retrieves the device session and locations from busLocationService, and constructs the HomeViewModel used by the
-    /// view.</remarks>
-    /// <param name="cancellationToken">A cancellation token that can be used to cancel the asynchronous operation.</param>
-    /// <returns>An IActionResult that renders the home view with a HomeViewModel containing retrieved locations, default
-    /// origin/destination selections, and the departure date.</returns>
-    public async Task<IActionResult> Index(
-        CancellationToken cancellationToken)
+    /// <remarks>
+    /// Mevcut HTTP oturumunu kullanarak bir Obilet oturumu oluşturur veya mevcut oturumu korur.
+    /// busLocationService aracılığıyla lokasyonları getirir ve HomeViewModel nesnesini
+    /// varsayılan kalkış noktası, varış noktası ve yarının tarihiyle başlatır.
+    /// </remarks>
+    /// <param name="cancellationToken">
+    /// Asenkron işlemi iptal etmek için kullanılan iptal belirteci.
+    /// </param>
+    /// <returns>
+    /// Lokasyonları, varsayılan kalkış ve varış noktalarını ve hareket tarihini içeren
+    /// HomeViewModel nesnesiyle ana sayfayı görüntüleyen bir IActionResult döndürür.
+    /// </returns>
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
 
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() == "::1"
-            ? "127.0.0.1"
-            : HttpContext.Connection.RemoteIpAddress?.ToString();
+            ? "127.0.0.1" : HttpContext.Connection.RemoteIpAddress?.ToString();
 
         var sessionRequest = new GetSessionRequest(
             Type: 1,
@@ -57,25 +60,29 @@ public class HomeController(IObiletSessionService obiletSessionService,
     }
 
 
-
-
     /// <summary>
-    /// Validates search input, enforces business rules, and navigates to the Journey index when valid; otherwise
-    /// returns the search form with validation errors.
+    /// Arama kriterlerini doğrular. Kriterler geçerliyse yolculuklar sayfasına ilgili rota
+    /// parametreleriyle yönlendirir; geçersizse doğrulama hatalarıyla birlikte ana sayfayı döndürür.
     /// </summary>
-    /// <remarks>HTTP POST action protected by anti-forgery validation. Performs ModelState validation,
-    /// ensures OriginId and DestinationId differ, and enforces DepartureDate not earlier than today. On invalid model,
-    /// retrieves locations and returns the home view with errors.</remarks>
-    /// <param name="model">SearchJourneyViewModel containing search criteria and display values (OriginId, DestinationId, OriginName,
-    /// DestinationName, DepartureDate).</param>
-    /// <param name="cancellationToken">Token used to cancel the asynchronous operation.</param>
-    /// <returns>An IActionResult that redirects to the Journey index with route values when the model is valid, or returns the
-    /// search form populated with validation errors when invalid.</returns>
+    /// <remarks>
+    /// Doğrulama kuralları: Kalkış ve varış noktaları birbirinden farklı olmalıdır; hareket tarihi
+    /// bugün veya daha ileri bir tarih olmalıdır. Model geçersiz olduğunda cihaz oturumuna ait
+    /// lokasyonlar yeniden alınır ve model doğrulama hatalarıyla birlikte ana sayfa döndürülür.
+    /// </remarks>
+    /// <param name="model">
+    /// Kalkış ve varış noktalarının kimliklerini, görüntülenecek adlarını ve hareket tarihini
+    /// içeren arama kriterleri.
+    /// </param>
+    /// <param name="cancellationToken">
+    /// Asenkron işlemi iptal etmek için kullanılan iptal belirteci.
+    /// </param>
+    /// <returns>
+    /// Model geçerliyse rota parametreleriyle Yolculuklar sayfasına yönlendiren; geçersizse
+    /// doğrulama hatalarıyla birlikte ana sayfayı döndüren bir IActionResult.
+    /// </returns>
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Search(
-        SearchJourneyViewModel model,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> Search(SearchJourneyViewModel model, CancellationToken cancellationToken)
     {
         if (ModelState.IsValid)
         {
@@ -121,18 +128,25 @@ public class HomeController(IObiletSessionService obiletSessionService,
 
 
     /// <summary>
-    /// Searches for locations that match the specified keyword and returns a JSON array of objects with id, name, and
-    /// longName.
+    /// Belirtilen anahtar kelimeyle eşleşen otobüs lokasyonlarını arar ve kimlik, ad ve uzun ad bilgilerini içeren bir JSON sonucu döndürür.
     /// </summary>
-    /// <remarks>If keyword is null or whitespace an empty array is returned. The device session is obtained
-    /// from HttpContext.Session. The underlying search call is invoked with CancellationToken.None.</remarks>
-    /// <param name="keyword">Search term used to match locations.</param>
-    /// <param name="cancellationToken">Cancellation token for the request; not forwarded to the underlying location search call.</param>
-    /// <returns>A JSON result containing an array of matching locations, each object with properties id, name, and longName.</returns>
+    /// <remarks>
+    /// HttpContext.Session üzerinden cihaz oturumunu alır. busLocationService.SearchAsync
+    /// metoduna yapılan çağrıda CancellationToken.None kullanılır.
+    /// </remarks>
+    /// <param name="keyword">
+    /// Lokasyonları filtrelemek için kullanılan arama terimi. Null veya boşluk karakterlerinden
+    /// oluşuyorsa boş bir dizi döndürülür.
+    /// </param>
+    /// <param name="cancellationToken">
+    /// İstek için kullanılan iptal belirteci; lokasyon arama çağrısına aktarılmaz.
+    /// </param>
+    /// <returns>
+    /// Her biri id, name ve longName özelliklerini içeren eşleşen lokasyonlardan oluşan
+    /// bir diziyi içeren JSON sonucu döndürür.
+    /// </returns>
     [HttpGet]
-    public async Task<IActionResult> SearchLocations(
-    string keyword,
-    CancellationToken cancellationToken)
+    public async Task<IActionResult> SearchLocations(string keyword, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(keyword))
             return Json(Array.Empty<object>());
@@ -153,9 +167,23 @@ public class HomeController(IObiletSessionService obiletSessionService,
         }));
     }
 
-    private Task<IActionResult> ReturnHomeWithErrorsAsync(
-        SearchJourneyViewModel model,
-        IReadOnlyList<BusLocationDto> locations)
+
+    /// <summary>
+    /// Verilen arama modeli ve lokasyonlar kullanılarak oluşturulan HomeViewModel ile Index görünümünü döndürür.
+    /// </summary>
+    /// <remarks>
+    /// model.DepartureDate değeri null ise DepartureDate özelliği yarının tarihi olarak ayarlanır.
+    /// </remarks>
+    /// <param name="model">
+    /// Seçilen kalkış ve varış noktalarının kimliklerini ve adlarını, ayrıca isteğe bağlı hareket tarihini içeren SearchJourneyViewModel nesnesi.
+    /// </param>
+    /// <param name="locations">
+    /// HomeViewModel nesnesinin Locations özelliğini doldurmak için kullanılan salt okunur BusLocationDto listesi.
+    /// </param>
+    /// <returns>
+    /// Oluşturulan HomeViewModel ile Index görünümünü görüntüleyen bir IActionResult sonucuna dönüşen Task.
+    /// </returns>
+    private Task<IActionResult> ReturnHomeWithErrorsAsync(SearchJourneyViewModel model, IReadOnlyList<BusLocationDto> locations)
     {
         var viewModel = new HomeViewModel
         {
@@ -171,10 +199,20 @@ public class HomeController(IObiletSessionService obiletSessionService,
     }
 
 
+    /// <summary>
+    /// Activity.Current?.Id veya HttpContext.TraceIdentifier üzerinden elde edilen RequestId değerini
+    /// içeren bir ErrorViewModel ile hata görünümünü görüntüler.
+    /// </summary>
+    /// <remarks>
+    /// Yanıt önbelleğe alınmaz (ResponseCache: Duration=0, Location=None, NoStore=true).
+    /// </remarks>
+    /// <returns>
+    /// Hata görünümünü görüntüleyen bir IActionResult döndürür.
+    /// </returns>
     [ResponseCache(
-        Duration = 0,
-        Location = ResponseCacheLocation.None,
-        NoStore = true)]
+     Duration = 0,
+     Location = ResponseCacheLocation.None,
+     NoStore = true)]
     public IActionResult Error()
     {
         return View(new ErrorViewModel

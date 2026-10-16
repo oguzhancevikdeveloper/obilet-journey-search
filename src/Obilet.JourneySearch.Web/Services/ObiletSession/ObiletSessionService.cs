@@ -1,7 +1,4 @@
-﻿using Obilet.JourneySearch.Web.Models.Api.Location;
-using Obilet.JourneySearch.Web.Models.Api.Session;
-
-namespace Obilet.JourneySearch.Web.Services.ObiletSession;
+﻿namespace Obilet.JourneySearch.Web.Services.ObiletSession;
 
 /// <summary>
 /// Obilet Business API ile oturum yönetimini sağlayan servis.

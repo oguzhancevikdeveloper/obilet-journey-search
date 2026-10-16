@@ -1,6 +1,4 @@
-﻿using Obilet.JourneySearch.Web.Models.Api.Location;
-
-namespace Obilet.JourneySearch.Web.Services.Location;
+﻿namespace Obilet.JourneySearch.Web.Services.Location;
 
 /// <summary>
 /// Otobus konumları (şehirler) ile ilgili işlemleri yönetir.

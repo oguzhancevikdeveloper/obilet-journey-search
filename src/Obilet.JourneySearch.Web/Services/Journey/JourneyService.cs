@@ -1,6 +1,4 @@
-﻿using Obilet.JourneySearch.Web.Models.Api.Journey;
-
-namespace Obilet.JourneySearch.Web.Services.Journey;
+﻿namespace Obilet.JourneySearch.Web.Services.Journey;
 
 /// <summary>
 /// Otobus seferlerini (yazılı rota ve zaman tablosed) yönetir.
