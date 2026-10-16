@@ -1,8 +1,78 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model Obilet.JourneySearch.Web.Models.ViewModels.HomeViewModel
+
+@{
+    ViewData["Title"] = "Otobüs Bileti Ara";
+    var locations = Model.Locations;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <h1 class="mb-4">Otobüs Bileti Ara</h1>
+
+    <form>
+        <div class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label for="originId" class="form-label">Nereden</label>
+                <select id="originId" name="originId" class="form-select">
+                    @foreach (var location in locations)
+                    {
+                        <option value="@location.Id"
+                                selected="@(location.Id == Model.OriginId)">
+                            @location.Name
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button type="button"
+                        id="swapLocations"
+                        class="btn btn-outline-secondary w-100">
+                    ⇄ Değiştir
+                </button>
+            </div>
+
+            <div class="col-md-5">
+                <label for="destinationId" class="form-label">Nereye</label>
+                <select id="destinationId" name="destinationId" class="form-select">
+                    @foreach (var location in locations)
+                    {
+                        <option value="@location.Id"
+                                selected="@(location.Id == Model.DestinationId)">
+                            @location.Name
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="departureDate" class="form-label">Gidiş tarihi</label>
+                <input type="date"
+                       id="departureDate"
+                       name="departureDate"
+                       class="form-control"
+                       value="@Model.DepartureDate.ToString("yyyy-MM-dd")"
+                       min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div id="validationMessage"
+     class="alert alert-danger mt-3 d-none"
+     role="alert">
 </div>
+
+            <div class="col-md-4">
+                <button type="button" id="todayButton"
+                        class="btn btn-outline-secondary me-2">
+                    Bugün
+                </button>
+                <button type="button" id="tomorrowButton"
+                        class="btn btn-outline-secondary">
+                    Yarın
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/home.js" asp-append-version="true"></script>
+}

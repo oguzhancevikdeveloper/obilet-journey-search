@@ -4,3 +4,7 @@ global using System.Net.Http.Headers;
 global using System.Text;
 global using Obilet.JourneySearch.Web.Services.Location;
 global using Obilet.JourneySearch.Web.Services.ObiletSession;
+global using Microsoft.AspNetCore.Mvc;
+global using Obilet.JourneySearch.Web.Models;
+global using Obilet.JourneySearch.Web.Models.Api.Session;
+global using System.Diagnostics;
