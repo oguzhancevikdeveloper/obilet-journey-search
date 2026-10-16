@@ -1,3 +1,4 @@
+using Obilet.JourneySearch.Web.Models.Api.Location;
 using Obilet.JourneySearch.Web.Models.ViewModels;
 
 namespace Obilet.JourneySearch.Web.Controllers;
@@ -43,6 +44,99 @@ public class HomeController(IObiletSessionService obiletSessionService,
 
 
         return View(viewModel);
+    }
+
+
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Search(
+        SearchJourneyViewModel model,
+        CancellationToken cancellationToken)
+    {
+        var deviceSession =
+            obiletSessionService.GetDeviceSession(HttpContext.Session);
+
+        var locations = await busLocationService.GetAllAsync(
+            deviceSession,
+            cancellationToken);
+
+        if (!ModelState.IsValid)
+        {
+            return await ReturnHomeWithErrorsAsync(
+                model, locations);
+        }
+
+        if (model.OriginId == model.DestinationId)
+        {
+            ModelState.AddModelError(
+                nameof(model.DestinationId),
+                "Kalkış ve varış noktaları aynı olamaz.");
+        }
+
+        if (model.DepartureDate!.Value.Date < DateTime.Today)
+        {
+            ModelState.AddModelError(
+                nameof(model.DepartureDate),
+                "Gidiş tarihi bugün veya daha ileri bir tarih olmalıdır.");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return await ReturnHomeWithErrorsAsync(
+                model, locations);
+        }
+
+        return RedirectToAction(
+            "Index",
+            "Journey",
+            new
+            {
+                originId = model.OriginId,
+                destinationId = model.DestinationId,
+                departureDate = model.DepartureDate.Value.ToString("yyyy-MM-dd")
+            });
+    }
+
+
+    [HttpGet]
+    public async Task<IActionResult> SearchLocations(
+    string keyword,
+    CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(keyword))
+            return Json(Array.Empty<object>());
+
+        var deviceSession =
+            obiletSessionService.GetDeviceSession(HttpContext.Session);
+
+        var locations = await busLocationService.SearchAsync(
+            deviceSession,
+            keyword,
+            CancellationToken.None);
+
+        return Json(locations.Select(location => new
+        {
+            id = location.Id,
+            name = location.Name,
+            longName = location.LongName
+        }));
+    }
+
+    private Task<IActionResult> ReturnHomeWithErrorsAsync(
+        SearchJourneyViewModel model,
+        IReadOnlyList<BusLocationDto> locations)
+    {
+        var viewModel = new HomeViewModel
+        {
+            Locations = locations,
+            OriginId = model.OriginId,
+            DestinationId = model.DestinationId,
+            DepartureDate = model.DepartureDate ?? DateTime.Today.AddDays(1)
+        };
+
+        return Task.FromResult<IActionResult>(View("Index", viewModel));
     }
 
     public IActionResult Privacy()

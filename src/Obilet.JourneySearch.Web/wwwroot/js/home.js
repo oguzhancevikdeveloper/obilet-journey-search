@@ -1,6 +1,13 @@
-﻿document.addEventListener("DOMContentLoaded", () => {
-    const originSelect = document.getElementById("originId");
-    const destinationSelect = document.getElementById("destinationId");
+﻿
+document.addEventListener("DOMContentLoaded", () => {
+    const originSearch = document.getElementById("originSearch");
+    const originId = document.getElementById("originId");
+    const originSuggestions = document.getElementById("originSuggestions");
+
+    const destinationSearch = document.getElementById("destinationSearch");
+    const destinationId = document.getElementById("destinationId");
+    const destinationSuggestions = document.getElementById("destinationSuggestions");
+
     const departureDate = document.getElementById("departureDate");
     const validationMessage = document.getElementById("validationMessage");
 
@@ -15,7 +22,15 @@
     function validateForm() {
         const today = formatDate(new Date());
 
-        if (originSelect.value === destinationSelect.value) {
+if (!originId.value || !destinationId.value) {
+    validationMessage.classList.add("d-none");
+    return false;
+}
+if (!originId.value || !destinationId.value) {
+    return false;
+}
+
+        if (originId.value === destinationId.value) {
             validationMessage.textContent =
                 "Kalkış ve varış noktaları aynı olamaz.";
             validationMessage.classList.remove("d-none");
@@ -34,11 +49,117 @@
         return true;
     }
 
-    document.getElementById("swapLocations").addEventListener("click", () => {
-        const originValue = originSelect.value;
+    function setupAutocomplete(searchInput, hiddenId, suggestions) {
+        let searchTimeout;
+        let requestController;
 
-        originSelect.value = destinationSelect.value;
-        destinationSelect.value = originValue;
+searchInput.addEventListener("focus", () => {
+    searchInput.value = "";
+    hiddenId.value = "";
+    suggestions.style.display = "none";
+});
+
+        searchInput.addEventListener("input", () => {
+            hiddenId.value = "";
+            suggestions.replaceChildren();
+
+            const keyword = searchInput.value.trim();
+
+            clearTimeout(searchTimeout);
+
+            if (requestController) {
+                requestController.abort();
+            }
+
+            if (keyword.length < 2) {
+                suggestions.style.display = "none";
+                validateForm();
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                const controller = new AbortController();
+                requestController = controller;
+
+                try {
+                    const response = await fetch(
+                        `/Home/SearchLocations?keyword=${encodeURIComponent(keyword)}`,
+                        { signal: controller.signal }
+                    );
+
+                    if (!response.ok) {
+                        throw new Error("Lokasyon araması başarısız.");
+                    }
+
+                    const locations = await response.json();
+
+                    // Daha yeni bir istek başladıysa eski sonucu gösterme.
+                    if (controller !== requestController) {
+                        return;
+                    }
+
+                    suggestions.replaceChildren();
+
+                    if (locations.length === 0) {
+                        const emptyItem = document.createElement("div");
+                        emptyItem.className = "list-group-item text-muted";
+                        emptyItem.textContent = "Lokasyon bulunamadı.";
+                        suggestions.appendChild(emptyItem);
+                    } else {
+                        locations.forEach(location => {
+                            const item = document.createElement("button");
+                            item.type = "button";
+                            item.className = "list-group-item list-group-item-action";
+                            item.textContent = location.longName || location.name;
+
+                            item.addEventListener("click", () => {
+                                searchInput.value = location.name;
+                                hiddenId.value = location.id;
+                                suggestions.style.display = "none";
+                                validateForm();
+                            });
+
+                            suggestions.appendChild(item);
+                        });
+                    }
+
+                    suggestions.style.display = "block";
+                } catch (error) {
+                    if (error.name === "AbortError") {
+                        return;
+                    }
+
+                    console.error("Lokasyon arama hatası:", error);
+                    suggestions.style.display = "none";
+                }
+            }, 300);
+        });
+
+        document.addEventListener("click", event => {
+            if (!searchInput.contains(event.target) &&
+                !suggestions.contains(event.target)) {
+                suggestions.style.display = "none";
+            }
+        });
+    }
+
+    setupAutocomplete(originSearch, originId, originSuggestions);
+    setupAutocomplete(destinationSearch, destinationId, destinationSuggestions);
+
+    document.getElementById("swapLocations").addEventListener("click", () => {
+        const originValue = originId.value;
+        const destinationValue = destinationId.value;
+        const originText = originSearch.value;
+        const destinationText = destinationSearch.value;
+
+        originId.value = destinationValue;
+        destinationId.value = originValue;
+
+        originSearch.value = destinationText;
+        destinationSearch.value = originText;
+
+        originSuggestions.style.display = "none";
+        destinationSuggestions.style.display = "none";
 
         validateForm();
     });
@@ -51,14 +172,36 @@
     document.getElementById("tomorrowButton").addEventListener("click", () => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
-
         departureDate.value = formatDate(tomorrow);
         validateForm();
     });
 
-    originSelect.addEventListener("change", validateForm);
-    destinationSelect.addEventListener("change", validateForm);
     departureDate.addEventListener("change", validateForm);
 
-    validateForm();
+document.querySelector("form").addEventListener("submit", event => {
+    const originValid = originId.value.trim() !== "";
+    const destinationValid = destinationId.value.trim() !== "";
+
+    if (!originValid || !destinationValid) {
+        event.preventDefault();
+
+        if (!originValid && !destinationValid) {
+            validationMessage.textContent =
+                "Lütfen kalkış ve varış noktalarını seçin.";
+        } else if (!originValid) {
+            validationMessage.textContent =
+                "Lütfen kalkış noktasını seçin.";
+        } else {
+            validationMessage.textContent =
+                "Lütfen varış noktasını seçin.";
+        }
+
+        validationMessage.classList.remove("d-none");
+        return;
+    }
+
+    if (!validateForm()) {
+        event.preventDefault();
+    }
+});
 });

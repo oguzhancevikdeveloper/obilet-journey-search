@@ -8,20 +8,32 @@
 <div class="container mt-5">
     <h1 class="mb-4">Otobüs Bileti Ara</h1>
 
-    <form>
+<form asp-controller="Home"asp-action="Search"method="post">@Html.AntiForgeryToken()
         <div class="row g-3 align-items-end">
-            <div class="col-md-5">
-                <label for="originId" class="form-label">Nereden</label>
-                <select id="originId" name="originId" class="form-select">
-                    @foreach (var location in locations)
-                    {
-                        <option value="@location.Id"
-                                selected="@(location.Id == Model.OriginId)">
-                            @location.Name
-                        </option>
-                    }
-                </select>
-            </div>
+
+<div class="col-md-5">
+    <label for="originSearch" class="form-label">Nereden</label>
+
+    <div class="position-relative">
+        <input type="text"
+               id="originSearch"
+               class="form-control"
+               placeholder="Kalkış noktası ara..."
+               autocomplete="off"
+               value="@locations.FirstOrDefault(x => x.Id == Model.OriginId)?.Name" />
+
+        <input type="hidden"
+               id="originId"
+               name="OriginId"
+               value="@Model.OriginId" />
+
+        <div id="originSuggestions"
+             class="list-group position-absolute w-100 shadow-sm"
+             style="z-index: 1000; display: none;">
+        </div>
+    </div>
+</div>
+
 
             <div class="col-md-2">
                 <button type="button"
@@ -31,18 +43,30 @@
                 </button>
             </div>
 
-            <div class="col-md-5">
-                <label for="destinationId" class="form-label">Nereye</label>
-                <select id="destinationId" name="destinationId" class="form-select">
-                    @foreach (var location in locations)
-                    {
-                        <option value="@location.Id"
-                                selected="@(location.Id == Model.DestinationId)">
-                            @location.Name
-                        </option>
-                    }
-                </select>
-            </div>
+
+<div class="col-md-5">
+    <label for="destinationSearch" class="form-label">Nereye</label>
+
+    <div class="position-relative">
+        <input type="text"
+               id="destinationSearch"
+               class="form-control"
+               placeholder="Varış noktası ara..."
+               autocomplete="off"
+               value="@locations.FirstOrDefault(x => x.Id == Model.DestinationId)?.Name" />
+
+        <input type="hidden"
+               id="destinationId"
+               name="DestinationId"
+               value="@Model.DestinationId" />
+
+        <div id="destinationSuggestions"
+             class="list-group position-absolute w-100 shadow-sm"
+             style="z-index: 1000; display: none;">
+        </div>
+    </div>
+</div>
+
 
             <div class="col-md-4">
                 <label for="departureDate" class="form-label">Gidiş tarihi</label>
@@ -54,10 +78,14 @@
                        min="@DateTime.Today.ToString("yyyy-MM-dd")" />
             </div>
 
-            <div id="validationMessage"
-     class="alert alert-danger mt-3 d-none"
+<div asp-validation-summary="All"
+     class="text-danger mt-3"
      role="alert">
 </div>
+
+
+
+            <div id="validationMessage"class="alert alert-danger mt-3 d-none"role="alert"></div>
 
             <div class="col-md-4">
                 <button type="button" id="todayButton"
@@ -69,6 +97,10 @@
                     Yarın
                 </button>
             </div>
+
+            <button type="submit" class="btn btn-primary mt-3">
+    Sefer Ara
+</button>
         </div>
     </form>
 </div>
