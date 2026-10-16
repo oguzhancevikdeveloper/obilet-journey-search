@@ -8,7 +8,10 @@
 
   <ItemGroup>
     <Folder Include="Options\" />
-    <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetEnv" Version="3.2.0" />
   </ItemGroup>
 
 </Project>

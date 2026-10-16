@@ -1,0 +1,6 @@
+﻿global using Obilet.JourneySearch.Web.Configuration;
+global using Obilet.JourneySearch.Web.Services;
+global using System.Net.Http.Headers;
+global using System.Text;
+global using Obilet.JourneySearch.Web.Services.Location;
+global using Obilet.JourneySearch.Web.Services.ObiletSession;
