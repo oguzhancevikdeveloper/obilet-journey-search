@@ -53,13 +53,14 @@
 
                             <input type="text"
                                    id="originSearch"
+                                   name="OriginName"
                                    class="form-control home-input"
                                    placeholder="Kalkış noktası ara..."
                                    autocomplete="off"
                                    aria-label="Kalkış noktası"
                                    aria-autocomplete="list"
                                    aria-controls="originSuggestions"
-                                   value="@locations.FirstOrDefault(x => x.Id == Model.OriginId)?.Name" />
+                                   value="@Model.OriginName" />
 
                             <input type="hidden"
                                    id="originId"
@@ -100,7 +101,8 @@
                                    aria-label="Varış noktası"
                                    aria-autocomplete="list"
                                    aria-controls="destinationSuggestions"
-                                   value="@locations.FirstOrDefault(x => x.Id == Model.DestinationId)?.Name" />
+                                   name="DestinationName"
+                                   value="@Model.DestinationName" />
 
                             <input type="hidden"
                                    id="destinationId"

@@ -8,7 +8,9 @@ public class JourneyController(IJourneyService journeyService,
     [HttpGet]
     public async Task<IActionResult> Index(
         int originId,
+        string originName,
         int destinationId,
+        string destinationName,
         DateTime departureDate,
         CancellationToken cancellationToken)
     {
@@ -27,15 +29,8 @@ public class JourneyController(IJourneyService journeyService,
             var deviceSession = obiletSessionService.GetDeviceSession(
                 HttpContext.Session);
 
-            var locations = await busLocationService.GetAllAsync(
-                deviceSession,
-                cancellationToken);
-
-            var originName = locations
-                .FirstOrDefault(location => location.Id == originId)?.Name;
-
-            var destinationName = locations
-                .FirstOrDefault(location => location.Id == destinationId)?.Name;
+            var resolvedOriginName = originName ?? originId.ToString();
+            var resolvedDestinationName = destinationName ?? destinationId.ToString();
 
             var journeys = await journeyService.GetJourneysAsync(
                 deviceSession.SessionId,
@@ -48,8 +43,8 @@ public class JourneyController(IJourneyService journeyService,
             var viewModel = new JourneyViewModel(
                 originId,
                 destinationId,
-                originName ?? originId.ToString(),
-                destinationName ?? destinationId.ToString(),
+                resolvedOriginName,
+                resolvedDestinationName,
                 departureDate,
                 journeys);
 

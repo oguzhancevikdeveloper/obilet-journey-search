@@ -36,7 +36,9 @@ public class HomeController(IObiletSessionService obiletSessionService,
         {
             Locations = locations,
             OriginId = locations.Count > 0 ? locations[0].Id : null,
+            OriginName = locations.Count > 0 ? locations[0].Name : null,
             DestinationId = locations.Count > 1 ? locations[1].Id : null,
+            DestinationName = locations.Count > 1 ? locations[1].Name : null,
             DepartureDate = DateTime.Today.AddDays(1)
         };
 
@@ -89,7 +91,9 @@ public class HomeController(IObiletSessionService obiletSessionService,
             new
             {
                 originId = model.OriginId,
+                originName = model.OriginName,
                 destinationId = model.DestinationId,
+                destinationName = model.DestinationName,
                 departureDate = model.DepartureDate!.Value.ToString("yyyy-MM-dd")
             });
     }
@@ -128,7 +132,9 @@ public class HomeController(IObiletSessionService obiletSessionService,
         {
             Locations = locations,
             OriginId = model.OriginId,
+            OriginName = model.OriginName,
             DestinationId = model.DestinationId,
+            DestinationName = model.DestinationName,
             DepartureDate = model.DepartureDate ?? DateTime.Today.AddDays(1)
         };
 

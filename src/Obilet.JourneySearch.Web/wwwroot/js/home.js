@@ -104,8 +104,6 @@ if (!originId.value || !destinationId.value) {
         let requestController;
 
 searchInput.addEventListener("focus", () => {
-    searchInput.value = "";
-    hiddenId.value = "";
     suggestions.style.display = "none";
 });
 
@@ -162,12 +160,13 @@ searchInput.addEventListener("focus", () => {
                             item.className = "list-group-item list-group-item-action";
                             item.textContent = location.longName || location.name;
 
-                            item.addEventListener("click", () => {
-                                searchInput.value = location.name;
-                                hiddenId.value = location.id;
-                                suggestions.style.display = "none";
-                                validateForm();
-                            });
+item.addEventListener("click", () => {
+    searchInput.value = location.name;
+    hiddenId.value = location.id;
+
+    suggestions.style.display = "none";
+    validateForm();
+});
 
                             suggestions.appendChild(item);
                         });
