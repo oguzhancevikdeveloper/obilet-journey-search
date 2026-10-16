@@ -1,6 +1,4 @@
-﻿using DotNetEnv;
-
-namespace Obilet.JourneySearch.Web.Configuration;
+﻿namespace Obilet.JourneySearch.Web.Configuration;
 
 public static class EnvConfiguration
 {
@@ -28,7 +26,5 @@ public static class EnvConfiguration
 
     public static string OBILET_API_BASE_URL => Env.GetString("OBILET_API_BASE_URL");
     public static string OBILET_API_CLIENT_TOKEN => Env.GetString("OBILET_API_CLIENT_TOKEN");
-    public static string OBILET_API_APPLICATION_VERSION => Env.GetString("OBILET_API_APPLICATION_VERSION");
-    public static string OBILET_API_EQUIPMENT_ID => Env.GetString("OBILET_API_EQUIPMENT_ID");
-    public static string OBILET_API_LANGUAGE => Env.GetString("OBILET_API_LANGUAGE");
+
 }

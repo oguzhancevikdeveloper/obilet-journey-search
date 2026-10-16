@@ -2,5 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/Obilet.JourneySearch.Web/Obilet.JourneySearch.Web.csproj" />
   </Folder>
-  <Folder Name="/tests/" />
+  <Folder Name="/tests/">
+    <Project Path="tests/Obilet.JourneySearch.Tests/Obilet.JourneySearch.Tests.csproj" Id="6b4967f7-7826-42b7-b425-6edb6385e395" />
+  </Folder>
 </Solution>

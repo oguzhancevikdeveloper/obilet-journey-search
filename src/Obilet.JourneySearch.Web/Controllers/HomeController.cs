@@ -1,6 +1,3 @@
-using Obilet.JourneySearch.Web.Models.Api.Location;
-using Obilet.JourneySearch.Web.Models.ViewModels;
-
 namespace Obilet.JourneySearch.Web.Controllers;
 
 public class HomeController(IObiletSessionService obiletSessionService,
@@ -9,9 +6,10 @@ public class HomeController(IObiletSessionService obiletSessionService,
     public async Task<IActionResult> Index(
         CancellationToken cancellationToken)
     {
-        var ipAddress = "165.114.41.21";
-        //HttpContext.Connection.RemoteIpAddress?.ToString()
-        //?? "127.0.0.1";
+
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() == "::1"
+            ? "127.0.0.1"
+            : HttpContext.Connection.RemoteIpAddress?.ToString();
 
         var sessionRequest = new GetSessionRequest(
             Type: 1,
@@ -49,43 +47,40 @@ public class HomeController(IObiletSessionService obiletSessionService,
 
 
 
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Search(
         SearchJourneyViewModel model,
         CancellationToken cancellationToken)
     {
-        var deviceSession =
-            obiletSessionService.GetDeviceSession(HttpContext.Session);
-
-        var locations = await busLocationService.GetAllAsync(
-            deviceSession,
-            cancellationToken);
-
-        if (!ModelState.IsValid)
+        if (ModelState.IsValid)
         {
-            return await ReturnHomeWithErrorsAsync(
-                model, locations);
-        }
+            if (model.OriginId == model.DestinationId)
+            {
+                ModelState.AddModelError(
+                    nameof(model.DestinationId),
+                    "Kalkış ve varış noktaları aynı olamaz.");
+            }
 
-        if (model.OriginId == model.DestinationId)
-        {
-            ModelState.AddModelError(
-                nameof(model.DestinationId),
-                "Kalkış ve varış noktaları aynı olamaz.");
-        }
-
-        if (model.DepartureDate!.Value.Date < DateTime.Today)
-        {
-            ModelState.AddModelError(
-                nameof(model.DepartureDate),
-                "Gidiş tarihi bugün veya daha ileri bir tarih olmalıdır.");
+            if (model.DepartureDate!.Value.Date < DateTime.Today)
+            {
+                ModelState.AddModelError(
+                    nameof(model.DepartureDate),
+                    "Gidiş tarihi bugün veya daha ileri bir tarih olmalıdır.");
+            }
         }
 
         if (!ModelState.IsValid)
         {
-            return await ReturnHomeWithErrorsAsync(
-                model, locations);
+            var invalidModelDeviceSession =
+                obiletSessionService.GetDeviceSession(HttpContext.Session);
+
+            var invalidModelLocations = await busLocationService.GetAllAsync(
+                invalidModelDeviceSession,
+                cancellationToken);
+
+            return await ReturnHomeWithErrorsAsync(model, invalidModelLocations);
         }
 
         return RedirectToAction(
@@ -95,9 +90,10 @@ public class HomeController(IObiletSessionService obiletSessionService,
             {
                 originId = model.OriginId,
                 destinationId = model.DestinationId,
-                departureDate = model.DepartureDate.Value.ToString("yyyy-MM-dd")
+                departureDate = model.DepartureDate!.Value.ToString("yyyy-MM-dd")
             });
     }
+
 
 
     [HttpGet]
@@ -139,10 +135,6 @@ public class HomeController(IObiletSessionService obiletSessionService,
         return Task.FromResult<IActionResult>(View("Index", viewModel));
     }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
 
     [ResponseCache(
         Duration = 0,

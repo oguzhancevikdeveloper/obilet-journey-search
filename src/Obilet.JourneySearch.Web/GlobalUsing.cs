@@ -12,3 +12,6 @@ global using Obilet.JourneySearch.Web.Services.Journey;
 global using Microsoft.AspNetCore.Mvc;
 global using Obilet.JourneySearch.Web.Models.Api.Journey;
 global using Obilet.JourneySearch.Web.Models.ViewModels;
+global using DotNetEnv;
+global using Obilet.JourneySearch.Web.Models.Api.Location;
+global using Obilet.JourneySearch.Web.Models.ViewModels;

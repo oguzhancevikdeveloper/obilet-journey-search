@@ -1,7 +1,7 @@
 ﻿namespace Obilet.JourneySearch.Web.Services;
 
 public sealed class ObiletApiClient(
-    IHttpClientFactory httpClientFactory)
+    IHttpClientFactory httpClientFactory) : IObiletApiClient
 {
     private readonly HttpClient _httpClient =
         httpClientFactory.CreateClient("ObiletApi");

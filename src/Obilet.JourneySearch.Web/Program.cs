@@ -36,9 +36,10 @@ builder.Services.AddSession(options =>
 
 #region Configure ObiletApiClient and Services
 
+builder.Services.AddTransient<IObiletApiClient, ObiletApiClient>();
 builder.Services.AddTransient<ObiletApiClient>();
-builder.Services.AddScoped<IObiletSessionService,ObiletSessionService>();
-builder.Services.AddScoped<IBusLocationService,BusLocationService>();
+builder.Services.AddScoped<IObiletSessionService, ObiletSessionService>();
+builder.Services.AddScoped<IBusLocationService, BusLocationService>();
 builder.Services.AddTransient<IJourneyService, JourneyService>();
 
 #endregion
